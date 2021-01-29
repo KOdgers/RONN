@@ -1,0 +1,3 @@
+[submodule "LWrap"]
+	path = LettuceWrap
+	url = git@github.com:KOdgers/LettuceWrap
