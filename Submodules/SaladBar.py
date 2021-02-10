@@ -9,11 +9,9 @@ from tf_agents.specs import BoundedArraySpec
 from tf_agents.trajectories import time_step
 from sklearn.datasets import fetch_covtype
 
-tf.compat.v1.enable_v2_behavior()
-
-
 from Submodules.SaladWrap import *
 
+tf.compat.v1.enable_v2_behavior()
 
 
 class SaladBar:
@@ -25,14 +23,14 @@ class SaladBar:
         self.yt = None
         self.model = None
         self.max_epochs = None
-        self.params={}
-        self.params['lr']='all'
+        self.params = {}
+        self.params['lr'] = 'all'
 
-    def add_data(self,Data):
+    def add_data(self, Data):
         if self.XT:
             print('Data already loaded')
         else:
-            XT, xt, YT, yt = Data['XT'],Data['xt'],Data['YT'],Data['yt']
+            XT, xt, YT, yt = Data['XT'], Data['xt'], Data['YT'], Data['yt']
             self.XT = XT
             self.YT = YT
             self.xt = xt
@@ -40,23 +38,23 @@ class SaladBar:
 
     def add_model(self, model):
         if self.model:
-            return('Model already loaded')
+            return ('Model already loaded')
         else:
             self.model = model
 
-    def initialize_bar(self,data=None, model=None, max_epochs=100):
+    def initialize_bar(self, data=None, model=None, max_epochs=100):
         self.add_data(data)
         self.add_model(model)
         self.max_epochs = max_epochs
 
     def reset_bar(self):
-        inp,out = self.model(self.XT.shape[1],self.YT.shape[1])
-        self.SaladWrap = MultiSGDLCA(inputs = [inp],outputs=out,lca_type='Mean',optimizer_allocation=self.params['lr'])
+        inp, out = self.model(self.XT.shape[1], self.YT.shape[1])
+        self.SaladWrap = MultiSGDLCA(inputs=[inp], outputs=out, lca_type='Mean', optimizer_allocation=self.params['lr'])
         self.SaladWrap.optimizer_allocation()
-        self.SaladWrap.Fit(x=self.XT, y=self.YT, validation_data=(self.xt, self.yt), epochs=1,batch_size=64)
+        self.SaladWrap.Fit(x=self.XT, y=self.YT, validation_data=(self.xt, self.yt), epochs=1, batch_size=64)
         self.last_loss = self.SaladWrap.loss
 
-    def load_data_covtype(self,type='train'):
+    def load_data_covtype(self, type='train'):
         print("Loading forest cover dataset...")
 
         cover = fetch_covtype()
@@ -70,7 +68,7 @@ class SaladBar:
             XT, xt, YT, yt = train_test_split(np.array(df)[10000:20000], np.array(target)[10000:20000], test_size=.3)
         return {'XT': XT, 'YT': YT, 'xt': xt, 'yt': yt}
 
-    def load_test_model(self,inshape, outshape):
+    def load_test_model(self, inshape, outshape):
         input = keras.Input(shape=(inshape))
         X = keras.layers.Dense(5, activation='relu')(input)
         X = keras.layers.Dense(5, activation='relu')(X)
@@ -80,24 +78,21 @@ class SaladBar:
 
         return input, out
 
-    def advance(self,opts):
+    def advance(self, opts):
         self.SaladWrap.optimizer_allocation(opts)
-        self.SaladWrap.Fit(x=self.XT,y=self.YT,validation_data = (self.xt,self.yt),batch_size=16,epochs = 1)
+        self.SaladWrap.Fit(x=self.XT, y=self.YT, validation_data=(self.xt, self.yt), batch_size=16, epochs=1)
         reward = self.reward_function()
 
-        return np.asarray(reward,dtype=np.float32)
+        return np.asarray(reward, dtype=np.float32)
 
     def reward_function(self):
-        return ((self.last_loss-self.SaladWrap.loss)*len(self.SaladWrap.layers) +
-                np.sum([item/np.abs(item) for item in self.SaladWrap.get_lca_1d() if item !=0]))
-
-
-
+        return ((self.last_loss - self.SaladWrap.loss) * len(self.SaladWrap.layers) +
+                np.sum([item / np.abs(item) for item in self.SaladWrap.get_lca_1d() if item != 0]))
 
 
 class RONNEnviron1D(py_environment.PyEnvironment):
 
-    def __init__(self,train_eval='train'):
+    def __init__(self, train_eval='train'):
         # super().__init__()
         self.train_eval = train_eval
 
@@ -107,11 +102,10 @@ class RONNEnviron1D(py_environment.PyEnvironment):
         self.max_epochs = 100
         self.SaladBar.reset_bar()
 
-
         self._observation_spec = BoundedArraySpec(shape=(len(self.SaladBar.SaladWrap.get_epoch_return_1d()),),
                                                   dtype=np.float32,
-                                                  minimum=[-1000]*len(self.SaladBar.SaladWrap.get_epoch_return_1d()),
-                                                  maximum=[1000]*len(self.SaladBar.SaladWrap.get_epoch_return_1d()),
+                                                  minimum=[-1000] * len(self.SaladBar.SaladWrap.get_epoch_return_1d()),
+                                                  maximum=[1000] * len(self.SaladBar.SaladWrap.get_epoch_return_1d()),
                                                   name='observation')
         #
         self._action_spec = BoundedArraySpec(shape=(),
@@ -126,7 +120,6 @@ class RONNEnviron1D(py_environment.PyEnvironment):
         # self._discount_spec = BoundedArraySpec(shape=(1,), dtype=np.float32, minimum=0, maximum=1,
         #                                                   name='discount')
         #
-
 
     def action_spec(self):
         return self._action_spec
@@ -154,15 +147,15 @@ class RONNEnviron1D(py_environment.PyEnvironment):
 
         if ((self.SaladBar.SaladWrap.loss > self.SaladBar.last_loss) or
                 (self.SaladBar.SaladWrap.epochs_run == self.max_epochs)):
-            self._episode_ended =True
-            print('Reward:',reward)
+            self._episode_ended = True
+            print('Reward:', reward)
             return time_step.termination(observation=self.SaladBar.SaladWrap.get_epoch_return_1d(),
                                          reward=reward
                                          )
         else:
-            self.SaladBar.last_loss=self.SaladBar.SaladWrap.loss
+            self.SaladBar.last_loss = self.SaladBar.SaladWrap.loss
             return time_step.transition(observation=self.SaladBar.SaladWrap.get_epoch_return_1d(),
-                                        reward=reward,discount=1.0
+                                        reward=reward, discount=1.0
                                         )
         # return self._current_time_step
 
@@ -171,7 +164,7 @@ class RONNEnviron1D(py_environment.PyEnvironment):
 
     def _reset(self):
         """Return initial_time_step."""
-        self._episode_ended=False
+        self._episode_ended = False
         self.SaladBar.reset_bar()
         return time_step.restart(observation=self.SaladBar.SaladWrap.get_epoch_return_1d())
 

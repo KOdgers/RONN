@@ -102,7 +102,7 @@ class MyTestCase(unittest.TestCase):
 
         lca_model.setup_lca_save(path='', basename='1D', occurence=10)
         lca_model.Fit(x=XT, y=YT, validation_data=(xt, yt), epochs=2,batch_size = 16)
-        assert type(lca_model.get_epoch_return_1d()) == list
+        assert type(lca_model.get_epoch_return_1d()) == np.ndarray
 
 
 if __name__ == '__main__':

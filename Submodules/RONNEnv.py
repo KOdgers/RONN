@@ -1,4 +1,5 @@
 import sys
+
 sys.path.append('.')
 
 import numpy as np
@@ -7,8 +8,6 @@ from tf_agents.specs.array_spec import BoundedArraySpec
 from tf_agents.trajectories import time_step
 
 from Submodules.SaladBar import SaladBar
-
-
 
 
 class RONNEnviron1D(py_environment.PyEnvironment):
@@ -23,11 +22,10 @@ class RONNEnviron1D(py_environment.PyEnvironment):
         self.max_epochs = 100
         self.SaladBar.reset_bar()
 
-
         self._observation_spec = BoundedArraySpec(shape=(len(self.SaladBar.SaladWrap.get_epoch_return_1d()),),
                                                   dtype=np.float32,
-                                                  minimum=[-1000]*len(self.SaladBar.SaladWrap.get_epoch_return_1d()),
-                                                  maximum=[1000]*len(self.SaladBar.SaladWrap.get_epoch_return_1d()),
+                                                  minimum=[-1000] * len(self.SaladBar.SaladWrap.get_epoch_return_1d()),
+                                                  maximum=[1000] * len(self.SaladBar.SaladWrap.get_epoch_return_1d()),
                                                   name='observation')
         #
         self._action_spec = BoundedArraySpec(shape=(),
@@ -42,7 +40,6 @@ class RONNEnviron1D(py_environment.PyEnvironment):
         # self._discount_spec = BoundedArraySpec(shape=(1,), dtype=np.float32, minimum=0, maximum=1,
         #                                                   name='discount')
         #
-
 
     def action_spec(self):
         return self._action_spec
@@ -70,15 +67,15 @@ class RONNEnviron1D(py_environment.PyEnvironment):
 
         if ((self.SaladBar.SaladWrap.loss > self.SaladBar.last_loss) or
                 (self.SaladBar.SaladWrap.epochs_run == self.max_epochs)):
-            self._episode_ended =True
-            print('Reward:',reward)
+            self._episode_ended = True
+            print('Reward:', reward)
             return time_step.termination(observation=self.SaladBar.SaladWrap.get_epoch_return_1d(),
                                          reward=reward
                                          )
         else:
-            self.SaladBar.last_loss=self.SaladBar.SaladWrap.loss
+            self.SaladBar.last_loss = self.SaladBar.SaladWrap.loss
             return time_step.transition(observation=self.SaladBar.SaladWrap.get_epoch_return_1d(),
-                                        reward=reward,discount=1.0
+                                        reward=reward, discount=1.0
                                         )
         # return self._current_time_step
 
@@ -87,7 +84,6 @@ class RONNEnviron1D(py_environment.PyEnvironment):
 
     def _reset(self):
         """Return initial_time_step."""
-        self._episode_ended=False
+        self._episode_ended = False
         self.SaladBar.reset_bar()
         return time_step.restart(observation=self.SaladBar.SaladWrap.get_epoch_return_1d())
-
