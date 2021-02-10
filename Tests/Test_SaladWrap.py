@@ -2,18 +2,19 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 import unittest
-from Submodules.SaladWrap import *
+import sys
+sys.path.append(".")
 
+
+import numpy as np
+import pandas as pd
 import tensorflow as tf
 from tensorflow import keras
 from sklearn.datasets import fetch_covtype
 from tensorflow.keras.utils import to_categorical
 from sklearn.model_selection import train_test_split
 
-# Helper libraries
-import numpy as np
-import pandas as pd
-
+from Submodules.SaladWrap import *
 
 def load_data_covtype():
     print("Loading forest cover dataset...")

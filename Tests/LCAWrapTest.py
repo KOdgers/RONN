@@ -3,19 +3,19 @@ from __future__ import division
 from __future__ import print_function
 import unittest
 import sys
-from sklearn.model_selection import train_test_split
-from tensorflow.keras.utils import to_categorical
-from Submodules.LettuceLeafs import LCAWrap
+sys.path.append(".")
 
-
-
+import numpy as np
+import pandas as pd
 import tensorflow as tf
 from tensorflow import keras
 from sklearn.datasets import fetch_covtype
+from sklearn.model_selection import train_test_split
+from tensorflow.keras.utils import to_categorical
 
-# Helper libraries
-import numpy as np
-import pandas as pd
+from Submodules.LettuceLeafs import LCAWrap
+
+
 
 
 def load_data_covtype():

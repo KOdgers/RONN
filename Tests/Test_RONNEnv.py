@@ -1,6 +1,9 @@
 import unittest
-from Submodules.RONNEnv import RONNEnviron1D
+import sys
+sys.path.append('.')
+
 from tf_agents.environments.utils import validate_py_environment
+from Submodules.RONNEnv import RONNEnviron1D
 
 
 class MyTestCase(unittest.TestCase):
