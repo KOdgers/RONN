@@ -1,25 +1,14 @@
-from LettuceWrap.LettuceLeafs import *
+from backup.LettuceLeafs import *
 
 
 import numpy as np
 import tensorflow as tf
 
-import pandas as pd
-import sys
-from psutil import virtual_memory
-from tensorflow.keras.optimizers import SGD, Adam
+from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.losses import categorical_crossentropy
-from tensorflow.keras.models import Model
-from tensorflow.keras.utils import to_categorical
-from sklearn.model_selection import train_test_split
 from tensorflow.keras.metrics import categorical_accuracy
 from sklearn.utils import shuffle
 
-
-
-from tensorflow.python.util import tf_decorator
-
-from sklearn.model_selection import train_test_split
 
 class MultiSGDLCA(LCAWrap):
 
