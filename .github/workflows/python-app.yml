@@ -37,5 +37,5 @@ jobs:
         # Running the Unittest
         python Tests/LCAWrapTest.py
         python Tests/Test_SaladWrap.py
-        python Tests/Test_RonnEnv.py
+        python Tests/Test_RONNEnv.py
         
