@@ -78,7 +78,7 @@ class LCAWrap(Model):
         else:
             x_test = kwargs['validation_data'][0]
             y_test = kwargs['validation_data'][1]
-        self.x_test = x_test
+        self.x_test = np.asarray(x_test).astype('float32')
         self.y_test = y_test
         # print('Y_test shape:',y_test.shape)
         self.epochs = epochs
