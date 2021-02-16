@@ -8,6 +8,8 @@ from tf_agents.specs.array_spec import BoundedArraySpec
 from tf_agents.trajectories import time_step
 
 from Submodules.SaladBar import SaladBar
+from Submodules.DataLoaders import *
+from Submodules.NetworkExamples import *
 
 
 class RONNEnviron1D(py_environment.PyEnvironment):
@@ -17,8 +19,8 @@ class RONNEnviron1D(py_environment.PyEnvironment):
         self.train_eval = train_eval
 
         self.SaladBar = SaladBar()
-        self.SaladBar.add_data(self.SaladBar.load_data_kddcup(self.train_eval))
-        self.SaladBar.add_model(self.SaladBar.load_test_model)
+        self.SaladBar.add_data(load_data_mnist(self.train_eval))
+        self.SaladBar.add_model(load_test_cnn_mnist)
         self.max_epochs = 100
         self.SaladBar.reset_bar()
 
@@ -47,50 +49,42 @@ class RONNEnviron1D(py_environment.PyEnvironment):
     def observation_spec(self):
         return self._observation_spec
 
-    # def reward_spec(self):
-    #     return self._reward_spec
-    #
-    # def discount_spec(self):
-    #     return self._discount_spec
-
     def _step(self, action):
         if self._episode_ended:
             return self.reset()
         """Apply action and return new time_step."""
-        # if self._current_time_step is None:
-        #     return self.reset()
-        # self._current_time_step = self._step(action)
-        print('Epoch #',action)
+
         reward = self.SaladBar.advance(action)
         # print(type(reward))
-        print('Epoch #',self.SaladBar.SaladWrap.epochs_run,'  Loss:',self.SaladBar.SaladWrap.loss,' Prev. Loss:', self.SaladBar.last_loss)
+        print('Epoch #',self.SaladBar.SaladWrap.epochs_run,'  Loss:',self.SaladBar.SaladWrap.loss,' Prev. Loss:', self.last_best_loss)
         # print(self.SaladBar.SaladWrap.epochs_run, self.max_epochs)
 
-        if (self.SaladBar.SaladWrap.loss <= self.SaladBar.last_loss):
+        if (self.SaladBar.SaladWrap.loss <= self.last_best_loss):
             self.bad_epochs +=1
+        else:
+            self.bad_epochs = 0
+            self.last_best_loss =self.SaladBar.SaladWrap.loss
 
         if ((self.bad_epochs >= 3) or
                 (self.SaladBar.SaladWrap.epochs_run == self.max_epochs)):
             self._episode_ended = True
-            print('Reward:', reward)
+            print('Reward:', self.SaladBar.SaladWrap.loss)
             return time_step.termination(observation=self.SaladBar.SaladWrap.get_epoch_return_1d(),
-                                         reward=reward
+                                         reward=self.SaladBar.SaladWrap.loss
                                          )
         else:
             self.SaladBar.last_loss = self.SaladBar.SaladWrap.loss
             return time_step.transition(observation=self.SaladBar.SaladWrap.get_epoch_return_1d(),
-                                        reward=reward, discount=0.75
+                                        reward=0, discount=1
                                         )
-        # return self._current_time_step
 
-    # def reset(self):
-    #     return self._reset()
 
     def _reset(self):
         """Return initial_time_step."""
         self._episode_ended = False
         self.bad_epochs =0
         self.SaladBar.reset_bar()
+        self.last_best_loss = self.SaladBar.SaladWrap.loss
         print('Epoch #',self.SaladBar.SaladWrap.epochs_run,'  Loss:',self.SaladBar.SaladWrap.loss,' Prev. Loss:', self.SaladBar.last_loss)
 
         return time_step.restart(observation=self.SaladBar.SaladWrap.get_epoch_return_1d())

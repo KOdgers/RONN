@@ -4,6 +4,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 import sys
+import datetime
 
 
 import base64
@@ -33,16 +34,18 @@ tf.compat.v1.enable_v2_behavior()
 sys.path.append('.')
 from Submodules.RONNEnv import *
 
-num_iterations = 250 # @param {type:"integer"}
+
+
+num_iterations = 500 # @param {type:"integer"}
 collect_episodes_per_iteration = 2 # @param {type:"integer"}
 replay_buffer_capacity = 2000 # @param {type:"integer"}
 
-fc_layer_params = [20,20]
+fc_layer_params = (100,)
 
 learning_rate = 1e-3 # @param {type:"number"}
 log_interval = 5 # @param {type:"integer"}
 num_eval_episodes = 10 # @param {type:"integer"}
-eval_interval = 50 # @param {type:"integer"}
+eval_interval = 5 # @param {type:"integer"}
 
 
 ######################################################################
@@ -182,10 +185,14 @@ for _ in range(num_iterations):
     returns.append(avg_return)
 
     # @test {"skip": true}
+print(returns)
+np.save('TestReturns', returns)
 
 steps = range(0, num_iterations + 1, eval_interval)
+plt.figure()
 plt.plot(steps, returns)
 plt.ylabel('Average Return')
 plt.xlabel('Step')
 plt.ylim(top=250)
+plt.savefig('Tempfig.png')
 

@@ -115,7 +115,7 @@ class MultiSGDLCA(LCAWrap):
 
         # print(np.mean(acc))
         self.loss = np.mean(acc)
-        #
+
 
     def Fit(self, **kwargs):
         try:
