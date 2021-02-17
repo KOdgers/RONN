@@ -14,13 +14,15 @@ from Submodules.NetworkExamples import *
 
 class RONNEnviron1D(py_environment.PyEnvironment):
 
-    def __init__(self, train_eval='train'):
+    def __init__(self, config, train_eval='train'):#
         # super().__init__()
         self.train_eval = train_eval
 
         self.SaladBar = SaladBar()
-        self.SaladBar.add_data(load_data_mnist(self.train_eval))
-        self.SaladBar.add_model(load_test_cnn_mnist)
+        # self.SaladBar.add_data(load_data_mnist(self.train_eval),name = load_data_mnist.__name__)
+        self.SaladBar.add_data(config['DataLoader'](self.train_eval),name = config['DataLoader'].__name__)
+        self.SaladBar.add_model(config['NetworkBuilder']())
+        # self.SaladBar.add_model(simple_seq_cnn_flat())
         self.max_epochs = 100
         self.SaladBar.reset_bar()
 
@@ -35,12 +37,7 @@ class RONNEnviron1D(py_environment.PyEnvironment):
                                              name='action',
                                              minimum=[-7]*len(self.SaladBar.SaladWrap.get_opt_1d()),
                                              maximum=[0]*len(self.SaladBar.SaladWrap.get_opt_1d()))
-        # self._reward_spec = BoundedArraySpec( shape = (1,),
-        #                                       dtype=np.float32,
-        #                                       minimum=-10,
-        #                                       maximum=10, name='reward')
-        # self._discount_spec = BoundedArraySpec(shape=(1,), dtype=np.float32, minimum=0, maximum=1,
-        #                                                   name='discount')
+
         #
 
     def action_spec(self):

@@ -35,3 +35,12 @@ metric for the network.
 - Pandas
 - psutils
 - matplotlib
+- keras-tuner
+
+## Benchmarking
+
+For each valid combination of network model and dataset, benchmark tests are 
+performed where a "standard" optimizer is used. The choice of optimizer and 
+starting learning rate is optimized by keras-tuner. After tuning, the configuration
+is evaluated 5 times to estimate expected optimal performance with simple learning 
+(no lr scheduler).

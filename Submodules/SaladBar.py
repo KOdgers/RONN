@@ -1,4 +1,5 @@
 import sys
+import warnings
 sys.path.append('.')
 
 import tensorflow as tf
@@ -30,7 +31,7 @@ class SaladBar:
         self.params = {}
         self.params['lr'] = 'individual'
 
-    def add_data(self, Data):
+    def add_data(self, Data,name = 'NA'):
         if self.XT:
             print('Data already loaded')
         else:
@@ -39,11 +40,14 @@ class SaladBar:
             self.YT = YT
             self.xt = xt
             self.yt = yt
+            self.data_name=name
 
     def add_model(self, model):
         if self.model:
             return ('Model already loaded')
         else:
+            if self.data_name not in model.valid_data:
+                warnings.warn('Data and model are not recommended')
             self.model = model
 
     def initialize_bar(self, data=None, model=None, max_epochs=100):
@@ -52,7 +56,7 @@ class SaladBar:
         self.max_epochs = max_epochs
 
     def reset_bar(self):
-        inp, out = self.model(self.XT.shape[1], self.YT.shape[1])
+        inp, out = self.model.build(self.XT.shape[1], self.YT.shape[1])
         self.SaladWrap = MultiSGDLCA(inputs=[inp], outputs=out, lca_type='Mean', optimizer_allocation=self.params['lr'])
         self.SaladWrap.optimizer_allocation()
         self.SaladWrap.Fit(x=self.XT, y=self.YT, validation_data=(self.xt, self.yt), epochs=1, batch_size=64)

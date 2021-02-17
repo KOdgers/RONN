@@ -51,9 +51,12 @@ eval_interval = 5 # @param {type:"integer"}
 ######################################################################
 ######################################################################
 ######################################################################
+configdict = {}
+configdict['DataLoader'] = load_data_covtype
+configdict['NetworkBuilder'] = simple_seq_model
 
-train_env = RONNEnviron1D(train_eval='train')
-eval_env = RONNEnviron1D(train_eval='eval')
+train_env = RONNEnviron1D(config=configdict,train_eval='train')
+eval_env = RONNEnviron1D(config=configdict,train_eval='eval')
 
 
 eval_env = tf_py_environment.TFPyEnvironment(eval_env)
