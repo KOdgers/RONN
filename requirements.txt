@@ -7,3 +7,4 @@ tensorflow_datasets~=4.2.0
 psutil~=5.8.0
 matplotlib~=3.3.3
 tf_agents~=0.7.0
+keras_tuner~=1.0.2

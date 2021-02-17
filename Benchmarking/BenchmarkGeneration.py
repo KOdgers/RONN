@@ -36,7 +36,7 @@ DataLoader = getmembers(DataLoaders, isfunction)
 DataLoader = [item for item in DataLoader if item[0][:4]=='load']
 Check = Networks[0][1]()
 BKeys = ['DataType','ModelArch','Optimizer','Starting LR','Pass 1',
-         'Pass 2','Pass3','Pass 4','Pass 5']
+         'Pass 2','Pass 3','Pass 4','Pass 5']
 BenchmarkRecord = {key: [] for key in BKeys}
 for i in Networks:
     for j in DataLoader:

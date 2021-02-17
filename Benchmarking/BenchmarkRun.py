@@ -75,10 +75,10 @@ class Benchmarking:
 
         tuner.search(self.XT, self.YT, epochs=50, validation_split=0.2, callbacks=[se_callback],verbose=0)
 
-        best_hps = tuner.get_best_hyperparameters(num_trials=1)[0]
+        self.best_hps = tuner.get_best_hyperparameters(num_trials=1)[0]
 
 
-        return best_hps.get('optimizer'), best_hps.get('LR')
+        return self.best_hps.get('optimizer'), self.best_hps.get('LR')
 
     def Evaluate(self):
         def model_builder(hp):
