@@ -53,7 +53,8 @@ for i in Networks:
             BenchmarkRecord['Starting LR'].append(vals[1])
             for l in range(1,6):
                 evals = BenchInstance.Evaluate()
-                BenchmarkRecord['Pass '+str(l)].append(evals[0])
+                BenchmarkRecord['Pass '+str(l)].append(evals[1])
+            print(BenchmarkRecord)
 
 BenchDF =pd.DataFrame.from_dict(BenchmarkRecord)
 BenchDF.to_hdf('BenchmarkPerformance.h5',key='V1')

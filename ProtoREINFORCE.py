@@ -4,6 +4,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 import sys
+import os
 import datetime
 
 
@@ -36,16 +37,22 @@ from Submodules.RONNEnv import *
 
 
 
-num_iterations = 500 # @param {type:"integer"}
+num_iterations = 300 # @param {type:"integer"}
 collect_episodes_per_iteration = 2 # @param {type:"integer"}
 replay_buffer_capacity = 2000 # @param {type:"integer"}
 
-fc_layer_params = (100,)
+fc_layer_params = [20,20]
 
-learning_rate = 1e-3 # @param {type:"number"}
+learning_rate = 1e-4 # @param {type:"number"}
 log_interval = 5 # @param {type:"integer"}
 num_eval_episodes = 10 # @param {type:"integer"}
 eval_interval = 5 # @param {type:"integer"}
+
+root_dir = os.path.expanduser('.')
+train_dir = os.path.join(root_dir, 'train')
+eval_dir = os.path.join(root_dir, 'eval')
+
+global_step = tf.compat.v1.train.get_or_create_global_step()
 
 
 ######################################################################
@@ -124,10 +131,17 @@ def compute_avg_return(environment, policy, num_episodes=10):
 
 # Please also see the metrics module for standard implementations of different
 # metrics.
+train_metrics = [
+    tf_metrics.NumberOfEpisodes(),
+    tf_metrics.EnvironmentSteps(),
+    tf_metrics.AverageReturnMetric(),
+    tf_metrics.AverageEpisodeLengthMetric(),
+]
 replay_buffer = tf_uniform_replay_buffer.TFUniformReplayBuffer(
     data_spec=tf_agent.collect_data_spec,
     batch_size=train_env.batch_size,
     max_length=replay_buffer_capacity)
+
 
 
 #@test {"skip": true}
@@ -174,7 +188,19 @@ for _ in range(num_iterations):
 
   # Use data from the buffer and update the agent's network.
   experience = replay_buffer.gather_all()
-  train_loss = tf_agent.train(experience)
+  try:
+      train_loss = tf_agent.train(experience)
+  except:
+      print(experience)
+      steps = range(0, num_iterations + 1, eval_interval)
+      plt.figure()
+      plt.plot(steps, returns)
+      plt.ylabel('Average Return')
+      plt.xlabel('Step')
+      # plt.ylim(top=250)
+      plt.savefig('Tempfig.png')
+      break
+
   replay_buffer.clear()
 
   step = tf_agent.train_step_counter.numpy()
@@ -196,6 +222,6 @@ plt.figure()
 plt.plot(steps, returns)
 plt.ylabel('Average Return')
 plt.xlabel('Step')
-plt.ylim(top=250)
+# plt.ylim(top=250)
 plt.savefig('Tempfig.png')
 

@@ -53,7 +53,7 @@ class RONNEnviron1D(py_environment.PyEnvironment):
 
         reward = self.SaladBar.advance(action)
         # print(type(reward))
-        print('Epoch #',self.SaladBar.SaladWrap.epochs_run,'  Loss:',self.SaladBar.SaladWrap.loss,' Prev. Loss:', self.last_best_loss)
+        # print('Epoch #',self.SaladBar.SaladWrap.epochs_run,'  Loss:',self.SaladBar.SaladWrap.loss,' Prev. Loss:', self.last_best_loss)
         # print(self.SaladBar.SaladWrap.epochs_run, self.max_epochs)
 
         if (self.SaladBar.SaladWrap.loss <= self.last_best_loss):
@@ -62,7 +62,7 @@ class RONNEnviron1D(py_environment.PyEnvironment):
             self.bad_epochs = 0
             self.last_best_loss =self.SaladBar.SaladWrap.loss
 
-        if ((self.bad_epochs >= 3) or
+        if ((self.bad_epochs > 10) or
                 (self.SaladBar.SaladWrap.epochs_run == self.max_epochs)):
             self._episode_ended = True
             print('Reward:', self.SaladBar.SaladWrap.loss)

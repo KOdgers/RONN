@@ -38,18 +38,22 @@ class MultiSGDLCA(LCAWrap):
         elif self.optimizer_allocation == 'edges':
             self.optimizer_allocation = self.edge_opts
 
-    def single_opt(self, lr=[-7]):
+    def single_opt(self, lr=[-5]):
         print('New Learning Rate:', lr)
         lr = (lr[0] if type(lr)==list else float(lr))
         opt = SGD(learning_rate=10**lr)
         self.opt_layers = {'opt1': self.layer_names}
         self.opt = {'opt1': opt}
+        self.optLR = {'opt1':lr[0]}
 
-    def edge_opts(self, lr=[.0001, .0001, .0001]):
-        self.opt = {'opt1': SGD(learning_rate=lr[0]), 'opt2': SGD(learning_rate=lr[1]),
-                    'opt2': SGD(learning_rate=lr[2])}
+    def edge_opts(self, lr=[-6,-5,-6]):
+        self.opt = {'opt1': SGD(learning_rate=10**lr[0]), 'opt2': SGD(learning_rate=10**lr[1]),
+                    'opt2': SGD(learning_rate=10**lr[2])}
+        self.optLR = {'opt1': lr[0], 'opt2': lr[1],
+                    'opt2': lr[2]}
 
         self.opt_layers = {}
+
         for i in range(0, len(self.layer_names)):
             if i <= self.layer_depths[0]:
                 temp_opt = 'opt1'
@@ -70,9 +74,11 @@ class MultiSGDLCA(LCAWrap):
 
         self.opt = {}
         self.opt_layers = {}
+        self.optLR={}
         for i in range(0, len(lr)):
             self.opt['opt' + str(i + 1)] = SGD(learning_rate=10**lr[i])
             self.opt_layers['opt' + str(i + 1)] = [self.layer_names[i]]
+            self.optLR['opt'+str(i+1)] = lr[i]
 
     def single_epoch_run(self, **kwargs):
         XTrain = kwargs['x']
@@ -142,10 +148,11 @@ class MultiSGDLCA(LCAWrap):
             if templ:
                 templ = templ / np.abs(templ) * min([1000, np.abs(templ)])
 
-            epoch_out.append((templ if templ is not np.nan else 0))
+            epoch_out.append((templ if templ == templ else 0))
+
         # print(epoch_out)
         for i in list(self.opt.keys()):
-            epoch_out.append(np.log10(float(self.opt[i].learning_rate.value())))
+            epoch_out.append(self.optLR[i])
         epoch_out.append(self.loss)
         return np.asarray(epoch_out, dtype=np.float32)
 
@@ -156,7 +163,7 @@ class MultiSGDLCA(LCAWrap):
             if templ:
                 templ = templ / np.abs(templ) * min([1000, np.abs(templ)])
 
-            epoch_out.append((templ if templ is not np.nan else 0))
+            epoch_out.append((templ if templ==templ else 0))
         return np.asarray(epoch_out)
 
     def get_opt_1d(self):
